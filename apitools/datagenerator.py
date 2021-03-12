@@ -164,7 +164,7 @@ class DataGenerator:
         else:
             items_schema = self.get_schema(items_type)
         if not items_schema:
-            raise Exception("Don't know how to generate '%s'"%items_type)
+            raise Exception("Don't know how to generate '%s' for schema '%s'"% (items_type,schema))
 
         min_items = schema.get("minItems", self.array_range[0])
         max_items = schema.get("maxItems", self.array_range[1])

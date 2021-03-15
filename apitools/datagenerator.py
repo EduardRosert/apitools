@@ -158,12 +158,23 @@ class DataGenerator:
         pass
 
     def random_array(self, schema):
+        # -- start extension 1: explicit handling of swagger/openapi 'example' child elements #
+        if "example" in schema:
+            return schema["example"]
+        # -- end extension 1 -- #
         items_type = schema["items"]["type"]
-        if items_type == 'object':
+        if items_type == 'object' and "name" in schema["items"]:
             items_schema = self.get_schema(schema["items"]["name"])
         else:
             items_schema = self.get_schema(items_type)
         if not items_schema:
+            # -- start extension 2: support for 'inline' definitions of array item schemas -- #
+            if "properties" in schema["items"]:
+                obj = {}
+                for prop in schema["items"]["properties"]:
+                    obj[prop] = self.random_value(schema["items"]["properties"][prop])
+                return obj
+            # -- end extension 2 -- #
             raise Exception("Don't know how to generate '%s' for schema '%s'"% (items_type,schema))
 
         min_items = schema.get("minItems", self.array_range[0])
